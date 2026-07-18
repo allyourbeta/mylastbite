@@ -1,4 +1,4 @@
-import { sql } from './_db'
+import { sql } from './_db.js'
 import { validateLog } from '../src/services/validateLog'
 import { isSlugAuthorized } from '../src/services/verifySlug'
 

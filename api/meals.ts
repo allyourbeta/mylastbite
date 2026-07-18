@@ -1,4 +1,4 @@
-import { sql } from './_db'
+import { sql } from './_db.js'
 
 // Vercel serverless function (spec §3). Public read, no auth — mirrors the
 // old anon-key read.
