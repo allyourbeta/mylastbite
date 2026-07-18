@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAppStore } from '../state/store'
+import { navigate } from '../navigation'
 import {
   resolveLogAttribution,
   clampManualMinutes,
@@ -149,6 +150,19 @@ export function EntryPage({ slug }: EntryPageProps) {
             : `Logged: ${formatMinutesAsTime(saved.minutes as number)}`}
         </p>
       )}
+
+      <p style={{ marginTop: 32 }}>
+        <a
+          href="/"
+          onClick={(e) => {
+            e.preventDefault()
+            navigate('/')
+          }}
+          style={{ color: '#E5199A' }}
+        >
+          View graph
+        </a>
+      </p>
     </main>
   )
 }

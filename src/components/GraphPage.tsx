@@ -4,7 +4,7 @@ import { filterEntriesByRange, medianMinutes, countDaysAtOrBeforeGoal } from '..
 import { MealChart } from './MealChart'
 import { RangeToggle } from './RangeToggle'
 import { StatsLines } from './StatsLines'
-import { navigate } from '../App'
+import { navigate } from '../navigation'
 
 export function GraphPage() {
   const entries = useAppStore((s) => s.entries)
