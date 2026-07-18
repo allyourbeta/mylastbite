@@ -1,25 +1,43 @@
 import { sql } from './_db'
 import { validateLog } from '../src/services/validateLog'
+import { isSlugAuthorized } from '../src/services/verifySlug'
 
-interface LogRequestBody {
+interface VerifyBody {
+  slug: string
+  verify: true
+}
+
+interface LogBody {
   slug: string
   day: string
   minutes: number | null
   is_fast: boolean
 }
 
-// Vercel serverless function (spec §3). Writes are only reachable through
-// here — the client never holds a database credential.
+type RequestBody = VerifyBody | LogBody
+
+function isVerifyRequest(body: RequestBody): body is VerifyBody {
+  return 'verify' in body && body.verify === true
+}
+
+// Vercel serverless function. The write secret (LOG_SLUG) is checked only
+// here — the client never holds it. A { verify: true } request checks the
+// slug without writing, for the entry page's on-load check.
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' })
     return
   }
 
-  const body: LogRequestBody = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
+  const body: RequestBody = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
 
-  if (!body || body.slug !== process.env.LOG_SLUG) {
+  if (!isSlugAuthorized(body?.slug, process.env.LOG_SLUG)) {
     res.status(401).json({ error: 'Unauthorized' })
+    return
+  }
+
+  if (isVerifyRequest(body)) {
+    res.status(200).json({ ok: true })
     return
   }
 

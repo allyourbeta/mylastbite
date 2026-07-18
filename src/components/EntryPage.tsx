@@ -19,9 +19,11 @@ interface SavedValue {
 
 export function EntryPage({ slug }: EntryPageProps) {
   const entries = useAppStore((s) => s.entries)
+  const authorized = useAppStore((s) => s.authorized)
   const loadEntries = useAppStore((s) => s.loadEntries)
   const logEntry = useAppStore((s) => s.logEntry)
   const rememberSlug = useAppStore((s) => s.rememberSlug)
+  const verifySlug = useAppStore((s) => s.verifySlug)
 
   const attribution = useMemo(() => resolveLogAttribution(new Date()), [])
   const existing = entries.find((e) => e.day === attribution.day)
@@ -37,7 +39,8 @@ export function EntryPage({ slug }: EntryPageProps) {
   useEffect(() => {
     rememberSlug(slug)
     loadEntries()
-  }, [slug, rememberSlug, loadEntries])
+    verifySlug(slug)
+  }, [slug, rememberSlug, loadEntries, verifySlug])
 
   useEffect(() => {
     if (existing && saved === null) {
@@ -50,7 +53,7 @@ export function EntryPage({ slug }: EntryPageProps) {
     setSubmitting(true)
     const { hours, minutes } = parseTimeInputValue(timeValue)
     const clamped = clampManualMinutes(hours, minutes)
-    await logEntry(attribution.day, clamped, false)
+    await logEntry(slug, attribution.day, clamped, false)
     setTimeValue(minutesToTimeInputValue(clamped))
     setSaved({ minutes: clamped, isFast: false })
     setSubmitting(false)
@@ -58,12 +61,23 @@ export function EntryPage({ slug }: EntryPageProps) {
 
   async function handleFast() {
     setSubmitting(true)
-    await logEntry(attribution.day, null, true)
+    await logEntry(slug, attribution.day, null, true)
     setSaved({ minutes: null, isFast: true })
     setSubmitting(false)
   }
 
   const hasExisting = existing != null || saved != null
+
+  if (authorized === false) {
+    return (
+      <main
+        style={{ padding: 24, maxWidth: 420, margin: '0 auto', width: '100%', textAlign: 'center' }}
+      >
+        <h1 style={{ fontSize: 20 }}>Not authorized</h1>
+        <p>Not authorized — check your link.</p>
+      </main>
+    )
+  }
 
   return (
     <main

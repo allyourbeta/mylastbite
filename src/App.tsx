@@ -23,13 +23,8 @@ export default function App() {
 
   const slug = parseLogSlug(pathname)
 
-  if (slug !== null && slug === import.meta.env.VITE_LOG_SLUG) {
-    return <EntryPage slug={slug} />
-  }
-
   if (slug !== null) {
-    navigate('/')
-    return null
+    return <EntryPage slug={slug} />
   }
 
   return <GraphPage />
