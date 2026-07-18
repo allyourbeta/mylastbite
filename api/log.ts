@@ -1,6 +1,6 @@
 import { sql } from './_db.js'
-import { validateLog } from '../src/services/validateLog'
-import { isSlugAuthorized } from '../src/services/verifySlug'
+import { validateLog } from '../src/services/validateLog.js'
+import { isSlugAuthorized } from '../src/services/verifySlug.js'
 
 interface VerifyBody {
   slug: string

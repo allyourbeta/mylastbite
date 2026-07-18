@@ -35,6 +35,7 @@ export function EntryPage({ slug }: EntryPageProps) {
     existing ? { minutes: existing.minutes, isFast: existing.isFast } : null,
   )
   const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   useEffect(() => {
     rememberSlug(slug)
@@ -51,19 +52,31 @@ export function EntryPage({ slug }: EntryPageProps) {
 
   async function handleLog() {
     setSubmitting(true)
-    const { hours, minutes } = parseTimeInputValue(timeValue)
-    const clamped = clampManualMinutes(hours, minutes)
-    await logEntry(slug, attribution.day, clamped, false)
-    setTimeValue(minutesToTimeInputValue(clamped))
-    setSaved({ minutes: clamped, isFast: false })
-    setSubmitting(false)
+    setSubmitError(null)
+    try {
+      const { hours, minutes } = parseTimeInputValue(timeValue)
+      const clamped = clampManualMinutes(hours, minutes)
+      await logEntry(slug, attribution.day, clamped, false)
+      setTimeValue(minutesToTimeInputValue(clamped))
+      setSaved({ minutes: clamped, isFast: false })
+    } catch {
+      setSubmitError('Saving failed — check your connection and try again.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   async function handleFast() {
     setSubmitting(true)
-    await logEntry(slug, attribution.day, null, true)
-    setSaved({ minutes: null, isFast: true })
-    setSubmitting(false)
+    setSubmitError(null)
+    try {
+      await logEntry(slug, attribution.day, null, true)
+      setSaved({ minutes: null, isFast: true })
+    } catch {
+      setSubmitError('Saving failed — check your connection and try again.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const hasExisting = existing != null || saved != null
@@ -122,6 +135,12 @@ export function EntryPage({ slug }: EntryPageProps) {
           Fasted today
         </button>
       </div>
+
+      {submitError && (
+        <p style={{ marginTop: 16, color: '#B00020' }} role="alert">
+          {submitError}
+        </p>
+      )}
 
       {saved && (
         <p style={{ marginTop: 24 }}>
