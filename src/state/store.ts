@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { fetchMeals } from '../api/supabaseRead'
+import { fetchMeals } from '../api/meals'
 import { logMeal as logMealApi } from '../api/logMeal'
 import type { MealEntry, RangeOption } from '../services/stats'
 

@@ -1,4 +1,4 @@
-// Pure stats/range logic for the graph page (spec §7). No React, no supabase.
+// Pure stats/range logic for the graph page (spec §7). No React, no database.
 
 import { formatDateKey } from './dayLogic'
 

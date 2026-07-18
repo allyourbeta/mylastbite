@@ -1,4 +1,4 @@
-// Pure day/time logic for meal logging (spec §4). No React, no supabase.
+// Pure day/time logic for meal logging (spec §4). No React, no database.
 
 /** Minutes-after-midnight representing 23:59, the after-midnight clamp target. */
 export const CLAMP_MINUTES = 1439

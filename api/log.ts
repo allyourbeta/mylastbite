@@ -1,4 +1,5 @@
-import { createClient } from '@supabase/supabase-js'
+import { sql } from './_db'
+import { validateLog } from '../src/services/validateLog'
 
 interface LogRequestBody {
   slug: string
@@ -7,8 +8,8 @@ interface LogRequestBody {
   is_fast: boolean
 }
 
-// Vercel serverless function (spec §6). Writes are only reachable through
-// here — the client never holds the service role key.
+// Vercel serverless function (spec §3). Writes are only reachable through
+// here — the client never holds a database credential.
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' })
@@ -22,28 +23,21 @@ export default async function handler(req: any, res: any) {
     return
   }
 
-  const { day, minutes, is_fast } = body
-
-  const supabase = createClient(
-    process.env.SUPABASE_URL as string,
-    process.env.SUPABASE_SERVICE_ROLE_KEY as string,
-  )
-
-  const { data, error } = await supabase
-    .from('meals')
-    .upsert({
-      day,
-      minutes: is_fast ? null : minutes,
-      is_fast,
-      updated_at: new Date().toISOString(),
-    })
-    .select()
-    .single()
-
-  if (error) {
-    res.status(500).json({ error: error.message })
+  const validation = validateLog(body)
+  if (!validation.valid) {
+    res.status(400).json({ error: validation.error })
     return
   }
 
-  res.status(200).json(data)
+  const rows = await sql`
+    insert into meals (day, minutes, is_fast, updated_at)
+    values (${body.day}, ${validation.minutes}, ${body.is_fast}, now())
+    on conflict (day) do update
+      set minutes = excluded.minutes,
+          is_fast = excluded.is_fast,
+          updated_at = excluded.updated_at
+    returning day::text as day, minutes, is_fast
+  `
+
+  res.status(200).json(rows[0])
 }

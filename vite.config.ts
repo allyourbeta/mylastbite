@@ -27,7 +27,7 @@ export default defineConfig({
       workbox: {
         runtimeCaching: [
           {
-            urlPattern: ({ url }) => url.hostname.endsWith('.supabase.co'),
+            urlPattern: ({ url }) => url.pathname === '/api/meals',
             handler: 'NetworkFirst',
             options: { cacheName: 'meals-data' },
           },
