@@ -4,3 +4,11 @@ create table if not exists meals (
   is_fast boolean not null default false,
   updated_at timestamptz not null default now()
 );
+
+create table if not exists daily_likes (
+  day date not null,
+  visitor_id uuid not null,
+  created_at timestamptz not null default now(),
+  primary key (day, visitor_id)
+);
+

@@ -20,6 +20,28 @@ export function roundToNearest5(minutes: number): number {
   return Math.min(rounded, CLAMP_MINUTES)
 }
 
+export const PACIFIC_TIME_ZONE = 'America/Los_Angeles'
+
+/** Calendar date in a named IANA time zone, formatted as YYYY-MM-DD. */
+export function formatDateKeyInTimeZone(date: Date, timeZone: string): string {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(date)
+
+  const year = parts.find((part) => part.type === 'year')?.value
+  const month = parts.find((part) => part.type === 'month')?.value
+  const day = parts.find((part) => part.type === 'day')?.value
+
+  if (!year || !month || !day) {
+    throw new Error(`Unable to format date in time zone: ${timeZone}`)
+  }
+
+  return `${year}-${month}-${day}`
+}
+
 /** Local calendar date as YYYY-MM-DD. */
 export function formatDateKey(date: Date): string {
   const y = date.getFullYear()

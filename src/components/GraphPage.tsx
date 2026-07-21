@@ -4,6 +4,7 @@ import { filterEntriesByRange, medianMinutes, countDaysAtOrBeforeGoal } from '..
 import { MealChart } from './MealChart'
 import { RangeToggle } from './RangeToggle'
 import { StatsLines } from './StatsLines'
+import { TodayLike } from './TodayLike'
 import { navigate } from '../navigation'
 
 export function GraphPage() {
@@ -40,6 +41,8 @@ export function GraphPage() {
           </button>
         )}
       </div>
+
+      {!entriesLoading && !entriesError && <TodayLike entries={entries} />}
 
       <div style={{ margin: '16px 0' }}>
         <RangeToggle value={range} onChange={setRange} />

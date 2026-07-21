@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAppStore } from '../state/store'
 import { navigate } from '../navigation'
+import { fetchDailyLikeCounts, LikesUnauthorizedError } from '../api/likes'
+import type { DailyLikeCount } from '../api/likes'
+import { PrivateLikeCounts } from './PrivateLikeCounts'
 import {
   resolveLogAttribution,
   clampManualMinutes,
@@ -37,12 +40,42 @@ export function EntryPage({ slug }: EntryPageProps) {
   )
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [likeCounts, setLikeCounts] = useState<DailyLikeCount[]>([])
+  const [likeCountsLoading, setLikeCountsLoading] = useState(true)
+  const [likeCountsError, setLikeCountsError] = useState(false)
 
   useEffect(() => {
     rememberSlug(slug)
     loadEntries()
     verifySlug(slug)
   }, [slug, rememberSlug, loadEntries, verifySlug])
+
+  useEffect(() => {
+    if (authorized !== true) return
+
+    let active = true
+    setLikeCountsLoading(true)
+    setLikeCountsError(false)
+
+    fetchDailyLikeCounts(slug)
+      .then((counts) => {
+        if (active) setLikeCounts(counts)
+      })
+      .catch((error: unknown) => {
+        if (!active) return
+        if (error instanceof LikesUnauthorizedError) {
+          return
+        }
+        setLikeCountsError(true)
+      })
+      .finally(() => {
+        if (active) setLikeCountsLoading(false)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [authorized, slug])
 
   useEffect(() => {
     if (existing && saved === null) {
@@ -149,6 +182,14 @@ export function EntryPage({ slug }: EntryPageProps) {
             ? 'Logged: Fasted today'
             : `Logged: ${formatMinutesAsTime(saved.minutes as number)}`}
         </p>
+      )}
+
+      {authorized === true && (
+        <PrivateLikeCounts
+          counts={likeCounts}
+          loading={likeCountsLoading}
+          error={likeCountsError}
+        />
       )}
 
       <p style={{ marginTop: 32 }}>

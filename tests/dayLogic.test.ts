@@ -5,6 +5,8 @@ import {
   minutesAfterMidnight,
   roundToNearest5,
   formatDateKey,
+  formatDateKeyInTimeZone,
+  PACIFIC_TIME_ZONE,
   previousDateKey,
   resolveLogAttribution,
   clampManualMinutes,
@@ -59,6 +61,18 @@ describe('roundToNearest5', () => {
     // 23:58 (1438) rounds up to 1440 (would be 24:00) — must clamp to 1439.
     expect(roundToNearest5(1438)).toBe(1439)
     expect(roundToNearest5(1439)).toBe(1439)
+  })
+})
+
+describe('formatDateKeyInTimeZone', () => {
+  it('uses the Pacific calendar day before midnight in California', () => {
+    const instant = new Date('2026-07-21T06:30:00Z')
+    expect(formatDateKeyInTimeZone(instant, PACIFIC_TIME_ZONE)).toBe('2026-07-20')
+  })
+
+  it('rolls to the next Pacific day after midnight in California', () => {
+    const instant = new Date('2026-07-21T08:30:00Z')
+    expect(formatDateKeyInTimeZone(instant, PACIFIC_TIME_ZONE)).toBe('2026-07-21')
   })
 })
 
