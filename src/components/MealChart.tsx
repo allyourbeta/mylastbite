@@ -67,7 +67,7 @@ export function MealChart({ entries, range, now }: MealChartProps) {
           tickFormatter={(m) => formatMinutesAsTime(m).replace(':00', '')}
         />
         <Tooltip content={<ChartTooltip />} />
-        <ReferenceLine y={GOAL_MINUTES} stroke="#E5199A" strokeDasharray="4 4" />
+        <ReferenceLine y={GOAL_MINUTES} stroke="#1A1AE6" strokeDasharray="4 4" />
         <Line
           dataKey="minutes"
           stroke="#F2A9D6"
