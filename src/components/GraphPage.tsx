@@ -20,7 +20,8 @@ export function GraphPage() {
     loadEntries()
   }, [loadEntries])
 
-  const visibleEntries = filterEntriesByRange(entries, range, new Date())
+  const now = new Date()
+  const visibleEntries = filterEntriesByRange(entries, range, now)
 
   return (
     <main style={{ padding: 24, maxWidth: 720, margin: '0 auto', width: '100%' }}>
@@ -50,7 +51,9 @@ export function GraphPage() {
 
       {entriesLoading && <p>Loading…</p>}
       {entriesError && <p>Couldn't load data: {entriesError}</p>}
-      {!entriesLoading && !entriesError && <MealChart entries={visibleEntries} />}
+      {!entriesLoading && !entriesError && (
+        <MealChart entries={visibleEntries} range={range} now={now} />
+      )}
 
       <StatsLines
         medianMinutes={medianMinutes(visibleEntries)}

@@ -13,17 +13,23 @@ export const GOAL_MINUTES = 21 * 60
 
 export type RangeOption = '30d' | '90d' | 'all'
 
+/** The (now - range days) boundary as a day key, or null for 'all' (no lower bound). */
+export function rangeCutoffDay(range: RangeOption, now: Date): string | null {
+  if (range === 'all') return null
+  const days = range === '30d' ? 30 : 90
+  const cutoff = new Date(now)
+  cutoff.setDate(cutoff.getDate() - days)
+  return formatDateKey(cutoff)
+}
+
 /** Filters entries to those on or after (now - range days). 'all' passes through. */
 export function filterEntriesByRange(
   entries: MealEntry[],
   range: RangeOption,
   now: Date,
 ): MealEntry[] {
-  if (range === 'all') return entries
-  const days = range === '30d' ? 30 : 90
-  const cutoff = new Date(now)
-  cutoff.setDate(cutoff.getDate() - days)
-  const cutoffKey = formatDateKey(cutoff)
+  const cutoffKey = rangeCutoffDay(range, now)
+  if (cutoffKey === null) return entries
   return entries.filter((e) => e.day >= cutoffKey)
 }
 

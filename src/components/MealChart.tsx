@@ -1,5 +1,6 @@
 import {
-  ScatterChart,
+  ComposedChart,
+  Line,
   Scatter,
   XAxis,
   YAxis,
@@ -8,68 +9,76 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
-import type { MealEntry } from '../services/stats'
+import type { MealEntry, RangeOption } from '../services/stats'
 import { GOAL_MINUTES, CHART_Y_MAX, CHART_Y_TICKS, computeChartYDomainMin } from '../services/stats'
-import { formatMinutesAsTime, formatShortDate } from '../services/dayLogic'
+import { formatMinutesAsTime } from '../services/dayLogic'
+import {
+  buildDayBuckets,
+  selectTickDays,
+  describeBucketValue,
+  formatBucketLabel,
+  type DayBucket,
+} from '../services/chartSeries'
 
 interface MealChartProps {
   entries: MealEntry[]
+  range: RangeOption
+  now: Date
 }
 
-function dayToTimestamp(day: string): number {
-  return new Date(`${day}T00:00:00`).getTime()
+interface ChartTooltipProps {
+  active?: boolean
+  payload?: Array<{ payload: DayBucket }>
 }
 
-export function MealChart({ entries }: MealChartProps) {
+function ChartTooltip({ active, payload }: ChartTooltipProps) {
+  if (!active || !payload?.length) return null
+  const bucket = payload[0].payload
+  return (
+    <div
+      style={{
+        background: '#fff',
+        border: '1px solid #ececec',
+        borderRadius: 6,
+        padding: '6px 10px',
+        fontSize: 13,
+      }}
+    >
+      <div style={{ color: '#666' }}>{formatBucketLabel(bucket.day)}</div>
+      <div>{describeBucketValue(bucket)}</div>
+    </div>
+  )
+}
+
+export function MealChart({ entries, range, now }: MealChartProps) {
   const yDomainMin = computeChartYDomainMin(entries)
-
-  const timedPoints = entries
-    .filter((e) => !e.isFast && e.minutes != null)
-    .map((e) => ({ x: dayToTimestamp(e.day), y: e.minutes as number, day: e.day }))
-
-  const fastPoints = entries
-    .filter((e) => e.isFast)
-    .map((e) => ({ x: dayToTimestamp(e.day), y: yDomainMin, day: e.day }))
+  const buckets = buildDayBuckets(entries, range, now, yDomainMin)
+  const tickDays = selectTickDays(buckets)
 
   return (
     <ResponsiveContainer width="100%" height={360}>
-      <ScatterChart margin={{ top: 16, right: 16, bottom: 8, left: 8 }}>
+      <ComposedChart data={buckets} margin={{ top: 16, right: 16, bottom: 8, left: 8 }}>
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis
-          dataKey="x"
-          type="number"
-          domain={['dataMin', 'dataMax']}
-          tickFormatter={(ts) => formatShortDate(new Date(ts))}
-          name="date"
-        />
+        <XAxis dataKey="day" ticks={tickDays} tickFormatter={formatBucketLabel} />
         <YAxis
-          dataKey="y"
           type="number"
-          domain={[() => yDomainMin, CHART_Y_MAX]}
+          domain={[yDomainMin, CHART_Y_MAX]}
           ticks={CHART_Y_TICKS}
           tickFormatter={(m) => formatMinutesAsTime(m).replace(':00', '')}
-          name="time"
         />
-        <Tooltip
-          labelFormatter={() => ''}
-          formatter={
-            ((value: number, _name: string, item: { payload: { x: number; day: string } }) => [
-              fastPoints.some((f) => f.day === item.payload.day)
-                ? 'Fasted'
-                : formatMinutesAsTime(value),
-              formatShortDate(new Date(item.payload.x)),
-            ]) as never
-          }
+        <Tooltip content={<ChartTooltip />} />
+        <ReferenceLine y={GOAL_MINUTES} stroke="#E5199A" strokeDasharray="4 4" />
+        <Line
+          dataKey="minutes"
+          stroke="#F2A9D6"
+          strokeWidth={1.5}
+          dot={{ r: 5, fill: '#E5199A', stroke: '#fff', strokeWidth: 1 }}
+          activeDot={{ r: 6 }}
+          connectNulls={false}
+          isAnimationActive={false}
         />
-        <ReferenceLine
-          y={GOAL_MINUTES}
-          stroke="#E5199A"
-          strokeDasharray="4 4"
-          label={{ value: 'goal', position: 'insideTopRight', fill: '#E5199A' }}
-        />
-        <Scatter data={timedPoints} fill="#E5199A" />
-        <Scatter data={fastPoints} fill="#FFD1EC" shape="diamond" />
-      </ScatterChart>
+        <Scatter dataKey="fastY" fill="#FFD1EC" shape="diamond" isAnimationActive={false} />
+      </ComposedChart>
     </ResponsiveContainer>
   )
 }
