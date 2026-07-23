@@ -35,16 +35,8 @@ function ChartTooltip({ active, payload }: ChartTooltipProps) {
   if (!active || !payload?.length) return null
   const bucket = payload[0].payload
   return (
-    <div
-      style={{
-        background: '#fff',
-        border: '1px solid #ececec',
-        borderRadius: 6,
-        padding: '6px 10px',
-        fontSize: 13,
-      }}
-    >
-      <div style={{ color: '#666' }}>{formatBucketLabel(bucket.day)}</div>
+    <div className="chart-tooltip">
+      <div className="chart-tooltip-date">{formatBucketLabel(bucket.day)}</div>
       <div>{describeBucketValue(bucket)}</div>
     </div>
   )
@@ -54,23 +46,36 @@ export function MealChart({ entries, range, now }: MealChartProps) {
   const yDomainMin = computeChartYDomainMin(entries)
   const buckets = buildDayBuckets(entries, range, now, yDomainMin)
   const tickDays = selectTickDays(buckets)
+  const tickStyle = { fill: '#746d72', fontSize: 11 }
 
   return (
-    <ResponsiveContainer width="100%" height={360}>
-      <ComposedChart data={buckets} margin={{ top: 16, right: 16, bottom: 8, left: 8 }}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="day" ticks={tickDays} tickFormatter={formatBucketLabel} />
+    <ResponsiveContainer width="100%" height={350}>
+      <ComposedChart data={buckets} margin={{ top: 14, right: 12, bottom: 4, left: 2 }}>
+        <CartesianGrid stroke="#eadfe5" strokeDasharray="3 4" vertical={false} />
+        <XAxis
+          dataKey="day"
+          ticks={tickDays}
+          tickFormatter={formatBucketLabel}
+          tick={tickStyle}
+          tickLine={false}
+          axisLine={{ stroke: '#eadfe5' }}
+          minTickGap={16}
+        />
         <YAxis
           type="number"
           domain={[yDomainMin, CHART_Y_MAX]}
           ticks={CHART_Y_TICKS}
           tickFormatter={(m) => formatMinutesAsTime(m).replace(':00', '')}
+          tick={tickStyle}
+          tickLine={false}
+          axisLine={false}
+          width={34}
         />
         <Tooltip content={<ChartTooltip />} />
         <ReferenceLine y={GOAL_MINUTES} stroke="#1A1AE6" strokeDasharray="4 4" />
         <Line
           dataKey="minutes"
-          stroke="#F2A9D6"
+          stroke="#EE8FC9"
           strokeWidth={1.5}
           dot={{ r: 5, fill: '#E5199A', stroke: '#fff', strokeWidth: 1 }}
           activeDot={{ r: 6 }}

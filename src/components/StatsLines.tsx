@@ -7,9 +7,14 @@ interface StatsLinesProps {
 
 export function StatsLines({ medianMinutes, daysAtOrBeforeGoal }: StatsLinesProps) {
   return (
-    <div style={{ fontSize: 14, color: '#1E1E1E', marginTop: 8 }}>
-      <p>Median last-meal time: {medianMinutes == null ? '—' : formatMinutesAsTime(medianMinutes)}</p>
-      <p>Days ≤ 9 PM: {daysAtOrBeforeGoal}</p>
+    <div className="stats-summary">
+      <span>
+        <strong>Median:</strong>{' '}
+        {medianMinutes == null ? '—' : formatMinutesAsTime(medianMinutes)}
+      </span>
+      <span>
+        <strong>Days ≤ 9 PM:</strong> {daysAtOrBeforeGoal}
+      </span>
     </div>
   )
 }

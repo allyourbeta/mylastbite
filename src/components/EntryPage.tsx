@@ -117,93 +117,79 @@ export function EntryPage({ slug }: EntryPageProps) {
 
   if (authorized === false) {
     return (
-      <main
-        style={{ padding: 24, maxWidth: 420, margin: '0 auto', width: '100%', textAlign: 'center' }}
-      >
-        <h1 style={{ fontSize: 20 }}>Not authorized</h1>
-        <p>Not authorized — check your link.</p>
-      </main>
+      <div className="app-page">
+        <main className="app-shell entry-shell">
+          <h1 className="page-title">Not authorized</h1>
+          <p>Not authorized — check your link.</p>
+        </main>
+      </div>
     )
   }
 
   return (
-    <main
-      style={{ padding: 24, maxWidth: 420, margin: '0 auto', width: '100%', textAlign: 'center' }}
-    >
-      <h1 style={{ fontSize: 20 }}>Log last meal</h1>
+    <div className="app-page">
+      <main className="app-shell entry-shell">
+        <h1 className="page-title">Log last meal</h1>
 
-      <input
-        type="time"
-        value={timeValue}
-        onChange={(e) => setTimeValue(e.target.value)}
-        style={{ fontSize: 32, padding: 12, width: '100%', margin: '24px 0' }}
-      />
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <button
-          onClick={handleLog}
-          disabled={submitting}
-          style={{
-            padding: 14,
-            fontSize: 18,
-            borderRadius: 8,
-            border: 'none',
-            background: '#E5199A',
-            color: '#fff',
-          }}
-        >
-          {hasExisting ? 'Update' : 'Log last meal'}
-        </button>
-        <button
-          onClick={handleFast}
-          disabled={submitting}
-          style={{
-            padding: 12,
-            fontSize: 16,
-            borderRadius: 8,
-            border: '1px solid #E5199A',
-            background: '#fff',
-            color: '#E5199A',
-          }}
-        >
-          Fasted today
-        </button>
-      </div>
-
-      {submitError && (
-        <p style={{ marginTop: 16, color: '#B00020' }} role="alert">
-          {submitError}
-        </p>
-      )}
-
-      {saved && (
-        <p style={{ marginTop: 24 }}>
-          {saved.isFast
-            ? 'Logged: Fasted today'
-            : `Logged: ${formatMinutesAsTime(saved.minutes as number)}`}
-        </p>
-      )}
-
-      {authorized === true && (
-        <PrivateLikeCounts
-          counts={likeCounts}
-          loading={likeCountsLoading}
-          error={likeCountsError}
+        <input
+          className="entry-time"
+          type="time"
+          value={timeValue}
+          onChange={(e) => setTimeValue(e.target.value)}
         />
-      )}
 
-      <p style={{ marginTop: 32 }}>
-        <a
-          href="/"
-          onClick={(e) => {
-            e.preventDefault()
-            navigate('/')
-          }}
-          style={{ color: '#E5199A' }}
-        >
-          View graph
-        </a>
-      </p>
-    </main>
+        <div className="entry-actions">
+          <button
+            className="primary-button"
+            onClick={handleLog}
+            disabled={submitting}
+          >
+            {hasExisting ? 'Update' : 'Log last meal'}
+          </button>
+          <button
+            className="secondary-button"
+            onClick={handleFast}
+            disabled={submitting}
+          >
+            Fasted today
+          </button>
+        </div>
+
+        {submitError && (
+          <p className="status-message error-message" role="alert">
+            {submitError}
+          </p>
+        )}
+
+        {saved && (
+          <p className="status-message">
+            {saved.isFast
+              ? 'Logged: Fasted today'
+              : `Logged: ${formatMinutesAsTime(saved.minutes as number)}`}
+          </p>
+        )}
+
+        {authorized === true && (
+          <PrivateLikeCounts
+            counts={likeCounts}
+            loading={likeCountsLoading}
+            error={likeCountsError}
+          />
+        )}
+
+        <p className="page-link-row">
+          <a
+            className="page-link"
+            href="/"
+            onClick={(e) => {
+              e.preventDefault()
+              navigate('/')
+            }}
+          >
+            View graph →
+          </a>
+        </p>
+      </main>
+    </div>
   )
 }

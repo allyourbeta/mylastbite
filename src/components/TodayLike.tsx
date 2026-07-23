@@ -68,41 +68,25 @@ export function TodayLike({ entries }: TodayLikeProps) {
   const entry = entries.find((item) => item.day === day)
 
   return (
-    <section
-      aria-label="Today's status"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 16,
-        padding: '14px 0',
-        borderBottom: '1px solid #ececec',
-      }}
-    >
-      <div style={{ minWidth: 0 }}>
+    <section className="today-status" aria-label="Today's status">
+      <div className="today-status-copy">
         <strong>Today</strong>
-        <span style={{ color: '#666' }}> · {todayStatus(entry)}</span>
+        <span className="muted-text"> · {todayStatus(entry)}</span>
       </div>
 
-      <div style={{ textAlign: 'right', flexShrink: 0 }}>
+      <div className="like-action">
         <button
+          className={`like-button${liked ? ' is-liked' : ''}`}
           type="button"
           onClick={handleLike}
           disabled={loading || submitting || liked}
           aria-pressed={liked}
-          style={{
-            border: 'none',
-            background: 'transparent',
-            color: liked ? '#E5199A' : '#333',
-            padding: '6px 2px',
-            fontWeight: 600,
-            opacity: loading ? 0.55 : 1,
-          }}
+          style={{ opacity: loading ? 0.55 : 1 }}
         >
           {liked ? '♥ Liked' : '♡ Like'}
         </button>
         {error && (
-          <div role="alert" style={{ fontSize: 12, color: '#B00020' }}>
+          <div className="small-error" role="alert">
             Couldn't save
           </div>
         )}

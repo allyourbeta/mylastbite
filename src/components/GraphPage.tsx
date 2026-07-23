@@ -24,41 +24,34 @@ export function GraphPage() {
   const visibleEntries = filterEntriesByRange(entries, range, now)
 
   return (
-    <main style={{ padding: 24, maxWidth: 720, margin: '0 auto', width: '100%' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 style={{ fontSize: 20, margin: 0 }}>mylastbite</h1>
-        {storedSlug && (
-          <button
-            onClick={() => navigate(`/log/${storedSlug}`)}
-            style={{
-              padding: '6px 14px',
-              borderRadius: 999,
-              border: 'none',
-              background: '#E5199A',
-              color: '#fff',
-            }}
-          >
-            Log
-          </button>
+    <div className="app-page">
+      <main className="app-shell graph-shell">
+        <header className="graph-header">
+          <h1 className="page-title">mylastbite</h1>
+          {storedSlug && (
+            <button className="log-button" onClick={() => navigate(`/log/${storedSlug}`)}>
+              Log
+            </button>
+          )}
+        </header>
+
+        {!entriesLoading && !entriesError && <TodayLike entries={entries} />}
+
+        <div className="range-row">
+          <RangeToggle value={range} onChange={setRange} />
+        </div>
+
+        {entriesLoading && <p className="loading-copy">Loading…</p>}
+        {entriesError && <p className="error-message">Couldn't load data: {entriesError}</p>}
+        {!entriesLoading && !entriesError && (
+          <MealChart entries={visibleEntries} range={range} now={now} />
         )}
-      </div>
 
-      {!entriesLoading && !entriesError && <TodayLike entries={entries} />}
-
-      <div style={{ margin: '16px 0' }}>
-        <RangeToggle value={range} onChange={setRange} />
-      </div>
-
-      {entriesLoading && <p>Loading…</p>}
-      {entriesError && <p>Couldn't load data: {entriesError}</p>}
-      {!entriesLoading && !entriesError && (
-        <MealChart entries={visibleEntries} range={range} now={now} />
-      )}
-
-      <StatsLines
-        medianMinutes={medianMinutes(visibleEntries)}
-        daysAtOrBeforeGoal={countDaysAtOrBeforeGoal(visibleEntries)}
-      />
-    </main>
+        <StatsLines
+          medianMinutes={medianMinutes(visibleEntries)}
+          daysAtOrBeforeGoal={countDaysAtOrBeforeGoal(visibleEntries)}
+        />
+      </main>
+    </div>
   )
 }
