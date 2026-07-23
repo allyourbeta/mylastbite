@@ -131,12 +131,14 @@ export function EntryPage({ slug }: EntryPageProps) {
       <main className="app-shell entry-shell">
         <h1 className="page-title">Log last meal</h1>
 
-        <input
-          className="entry-time"
-          type="time"
-          value={timeValue}
-          onChange={(e) => setTimeValue(e.target.value)}
-        />
+        <div className="entry-time-wrap">
+          <input
+            className="entry-time"
+            type="time"
+            value={timeValue}
+            onChange={(e) => setTimeValue(e.target.value)}
+          />
+        </div>
 
         <div className="entry-actions">
           <button
