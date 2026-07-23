@@ -248,12 +248,6 @@ input:focus-visible {
   gap: 20px;
 }
 
-.log-button {
-  padding: 7px 15px;
-  border: none;
-  background: var(--accent);
-  color: #fff;
-}
 
 .today-status {
   display: flex;

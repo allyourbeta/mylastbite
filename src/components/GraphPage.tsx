@@ -28,11 +28,6 @@ export function GraphPage() {
       <main className="app-shell graph-shell">
         <header className="graph-header">
           <h1 className="page-title">mylastbite</h1>
-          {storedSlug && (
-            <button className="log-button" onClick={() => navigate(`/log/${storedSlug}`)}>
-              Log
-            </button>
-          )}
         </header>
 
         {!entriesLoading && !entriesError && <TodayLike entries={entries} />}
@@ -51,6 +46,21 @@ export function GraphPage() {
           medianMinutes={medianMinutes(visibleEntries)}
           daysAtOrBeforeGoal={countDaysAtOrBeforeGoal(visibleEntries)}
         />
+
+        {storedSlug && (
+          <p className="page-link-row">
+            <a
+              className="page-link"
+              href={`/log/${storedSlug}`}
+              onClick={(e) => {
+                e.preventDefault()
+                navigate(`/log/${storedSlug}`)
+              }}
+            >
+              ← Log last meal
+            </a>
+          </p>
+        )}
       </main>
     </div>
   )
